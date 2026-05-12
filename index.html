@@ -1,0 +1,134 @@
+```html
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Study Monitor</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<style>
+body{
+background:#050510;
+color:white;
+font-family:Arial;
+padding:40px;
+}
+
+.card{
+background:#0d1020;
+border:1px solid #6c63ff;
+padding:20px;
+border-radius:20px;
+margin-bottom:20px;
+}
+
+button{
+background:#6c63ff;
+border:none;
+padding:10px 20px;
+border-radius:10px;
+color:white;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<h1>Realtime Study Monitor</h1>
+
+<div class="card">
+<h2>Авторизация</h2>
+
+<input id="email" placeholder="email">
+<input id="password" type="password" placeholder="password">
+
+<button onclick="signUp()">Регистрация</button>
+<button onclick="login()">Вход</button>
+</div>
+
+<div class="card">
+<h2>Статус</h2>
+
+<button onclick="startStudy()">Начать учебу</button>
+</div>
+
+<div class="card">
+<h2>ТОП студентов</h2>
+
+<div id="leaderboard"></div>
+</div>
+
+<script>
+
+const supabaseClient = supabase.createClient(
+"https://qbyonzuldevyddkpnole.supabase.co/rest/v1/",
+"sb_publishable_vDd_MtQ6xQ-JY5WQc8Zliw_Ir6u15IE"
+)
+
+async function signUp(){
+
+const email=document.getElementById("email").value
+const password=document.getElementById("password").value
+
+await supabaseClient.auth.signUp({
+email,
+password
+})
+
+alert("Аккаунт создан")
+}
+
+async function login(){
+
+const email=document.getElementById("email").value
+const password=document.getElementById("password").value
+
+await supabaseClient.auth.signInWithPassword({
+email,
+password
+})
+
+alert("Вход выполнен")
+}
+
+async function startStudy(){
+
+const {
+data:{user}
+}=await supabaseClient.auth.getUser()
+
+await supabaseClient
+.from("study_sessions")
+.insert({
+user_id:user.id,
+started_at:new Date()
+})
+
+alert("Сессия началась")
+}
+
+async function loadLeaderboard(){
+
+const {data}=await supabaseClient
+.from("profiles")
+.select("*")
+.order("total_study_seconds",{ascending:false})
+.limit(10)
+
+document.getElementById("leaderboard").innerHTML=
+data.map(user=>`
+<div>
+${user.username || "Пользователь"} —
+${user.total_study_seconds} сек
+</div>
+`).join("")
+}
+
+loadLeaderboard()
+
+</script>
+
+</body>
+</html>
+```
