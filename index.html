@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Realtime Study Monitor</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+
 <style>
 *{
 margin:0;
@@ -12,26 +14,34 @@ padding:0;
 box-sizing:border-box;
 font-family:Inter,sans-serif;
 }
+
 body{
-background:#050816;
+background:
+radial-gradient(circle at top,#ff4fd855,transparent 40%),
+linear-gradient(180deg,#0b0012,#050008);
 color:white;
 padding:25px;
+min-height:100vh;
 }
+
 .container{
 display:grid;
 grid-template-columns:420px 1fr;
 gap:20px;
 }
+
 .panel{
-background:#0b1020;
-border:1px solid rgba(255,0,170,.35);
+background:rgba(20,10,30,.92);
+border:1px solid rgba(255,105,210,.45);
 border-radius:24px;
 padding:20px;
+backdrop-filter:blur(18px);
 box-shadow:
-0 0 25px rgba(255,0,170,.12),
-inset 0 0 25px rgba(255,0,170,.05);
+0 0 40px rgba(255,0,170,.25),
+inset 0 0 30px rgba(255,105,210,.08);
 margin-bottom:20px;
 }
+
 .logo{
 font-size:12px;
 letter-spacing:4px;
@@ -39,14 +49,17 @@ opacity:.7;
 margin-bottom:12px;
 color:#ff4fd8;
 }
+
 .title{
 font-size:52px;
 font-weight:800;
 margin-bottom:25px;
 }
+
 .pink{
 color:#ff4fd8;
 }
+
 .cardTitle{
 font-size:12px;
 letter-spacing:2px;
@@ -54,20 +67,24 @@ opacity:.6;
 margin-bottom:20px;
 text-transform:uppercase;
 }
+
 .bigTimer{
 font-size:72px;
 font-weight:800;
-color:#63ffe0;
+color:#ff7cf0;
 margin-bottom:10px;
 }
+
 .small{
 opacity:.7;
 margin-bottom:20px;
 }
+
 .buttons{
 display:flex;
 gap:10px;
 }
+
 .btn{
 border:none;
 padding:14px 20px;
@@ -76,419 +93,222 @@ cursor:pointer;
 font-weight:700;
 color:white;
 }
+
 .green{
-background:#42f5c8;
-color:black;
+background:linear-gradient(135deg,#ff4fd8,#ff92e9);
 }
+
 .red{
-background:#ff5d73;
+background:linear-gradient(135deg,#ff4f88,#ff7ca8);
 }
+
 .dark{
-background:#171c31;
+background:#2a1635;
 }
-.profile{
-display:flex;
-gap:15px;
-align-items:center;
-margin-bottom:20px;
-}
-.avatar{
-width:60px;
-height:60px;
-border-radius:18px;
-background:#7dff6d;
-display:flex;
-align-items:center;
-justify-content:center;
-font-size:28px;
-font-weight:800;
-color:black;
-}
-.username{
-font-size:24px;
-font-weight:700;
-}
-.online{
-color:#63ffe0;
-margin-top:4px;
-}
-.badges{
-display:flex;
-gap:10px;
-margin-top:12px;
-flex-wrap:wrap;
-}
-.badge{
-background:#152038;
-padding:8px 12px;
-border-radius:12px;
-font-size:13px;
-border:1px solid rgba(255,255,255,.08);
-}
-.statusGrid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:12px;
-margin-top:20px;
-}
-.status{
-padding:18px;
-border-radius:18px;
-background:#11182d;
-border:1px solid rgba(255,255,255,.08);
-}
-.stats{
-display:grid;
-grid-template-columns:1fr 1fr 1fr;
-margin-top:20px;
-text-align:center;
-}
-.statNumber{
-font-size:36px;
-font-weight:800;
-}
-.tabs{
-display:flex;
-gap:10px;
-margin-top:20px;
-}
-.tab{
-flex:1;
-padding:14px;
-text-align:center;
-background:#11182d;
-border-radius:14px;
-border:1px solid rgba(255,255,255,.08);
-}
-.active{
-border:2px solid #ff4fd8;
-}
-.topUser{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:16px;
-background:#11182d;
-border-radius:16px;
-margin-bottom:10px;
-}
-.achievement{
-background:#11182d;
-border-radius:18px;
-padding:18px;
-border:1px solid rgba(255,255,255,.08);
-margin-bottom:12px;
-}
-.achievementTitle{
-font-size:20px;
-font-weight:700;
-margin-bottom:6px;
-}
+
 input{
 width:100%;
-background:#11182d;
-border:1px solid rgba(255,255,255,.08);
+background:#1a0f22;
+border:1px solid rgba(255,105,210,.25);
 padding:14px;
 border-radius:14px;
 color:white;
 margin-bottom:12px;
 }
+
 .chat{
 height:250px;
 overflow:auto;
 margin-bottom:12px;
 }
+
 .message{
-background:#11182d;
+background:#1a0f22;
 padding:12px;
 border-radius:12px;
 margin-bottom:10px;
+border:1px solid rgba(255,105,210,.15);
 }
-@media(max-width:900px){
-.container{
-grid-template-columns:1fr;
-}
-.title{
-font-size:38px;
-}
-.bigTimer{
-font-size:52px;
-}
+
+.topUser{
+display:flex;
+justify-content:space-between;
+padding:16px;
+background:#1a0f22;
+border-radius:16px;
+margin-bottom:10px;
+border:1px solid rgba(255,105,210,.15);
 }
 </style>
 </head>
+
 <body>
+
 <div class="logo">REALTIME MONITOR</div>
+
 <div class="title">
 Статусы <span class="pink">группы</span>
 </div>
+
 <div class="container">
+
 <div class="left">
+
 <div class="panel">
 <div class="cardTitle">Сессия учебы</div>
-<div class="bigTimer" id="timer">
-00:00
-</div>
-<div class="small">
-📚 Идет учебная сессия
-</div>
+<div class="bigTimer" id="timer">00:00</div>
+<div class="small">📚 Идет учебная сессия</div>
+
 <div class="buttons">
-<button class="btn green" onclick="startStudy()">
-▶️ Начать
-</button>
-<button class="btn red" onclick="stopStudy()">
-■ Завершить
-</button>
-<button class="btn dark">
-Выход
-</button>
+<button class="btn green" onclick="startStudy()">▶️ Начать</button>
+<button class="btn red" onclick="stopStudy()">■ Завершить</button>
 </div>
 </div>
+
 <div class="panel">
 <div class="cardTitle">Ваш профиль</div>
-<div class="profile">
-<div class="avatar">
-A
-</div>
-<div>
-<div class="username" id="username">
-Пользователь
-</div>
-<div class="online">
-● В сети
-</div>
-<div class="badges">
-<div class="badge">🏆 Первый шаг</div>
-<div class="badge">💬 Активист</div>
-</div>
-</div>
-</div>
-<div class="statusGrid">
-<div class="status">
-🟢 В сети
-</div>
-<div class="status">
-🟡 Отошел
-</div>
-<div class="status">
-🔴 Занят
-</div>
-<div class="status">
-⚪ Не беспокоить
-</div>
-</div>
+
 <div class="stats">
-<div>
-<div class="statNumber" id="studyStat">
-0
-</div>
-<div>часов</div>
-</div>
-<div>
-<div class="statNumber">
-0
-</div>
-<div>сообщ.</div>
-</div>
-<div>
-<div class="statNumber">
-2
-</div>
-<div>достиж.</div>
+<div id="studyStat">0 часов</div>
 </div>
 </div>
-<div class="tabs">
-<div class="tab">
-👥 Участники
-</div>
-<div class="tab active">
-🏆 Рейтинг
-</div>
-<div class="tab">
-🎖️ Достижения
-</div>
-</div>
-</div>
+
 <div class="panel">
-<div class="cardTitle">
-Топ студентов
-</div>
+<div class="cardTitle">Топ студентов</div>
 <div id="leaderboard"></div>
 </div>
+
 </div>
+
 <div class="right">
+
 <div class="panel">
-<div class="cardTitle">
-Авторизация
-</div>
+<div class="cardTitle">Авторизация</div>
 <input id="email" placeholder="Email">
 <input id="password" type="password" placeholder="Пароль">
+
 <div class="buttons">
-<button class="btn green" onclick="signUp()">
-Регистрация
-</button>
-<button class="btn dark" onclick="login()">
-Вход
-</button>
+<button class="btn green" onclick="signUp()">Регистрация</button>
+<button class="btn dark" onclick="login()">Вход</button>
 </div>
 </div>
+
 <div class="panel">
-<div class="cardTitle">
-Чат группы
-</div>
+<div class="cardTitle">Чат</div>
 <div class="chat" id="chat"></div>
+
 <input id="messageInput" placeholder="Сообщение...">
-<button class="btn green" onclick="sendMessage()">
-Отправить
-</button>
+<button class="btn green" onclick="sendMessage()">Отправить</button>
 </div>
-<div class="panel">
-<div class="cardTitle">
-Все достижения
+
 </div>
-<div class="achievement">
-<div class="achievementTitle">
-🌅 Ранняя пташка
+
 </div>
-<div>
-Зашел до 8 утра
-</div>
-</div>
-<div class="achievement">
-<div class="achievementTitle">
-🔥 Марафонец
-</div>
-<div>
-Учился 2 часа подряд
-</div>
-</div>
-<div class="achievement">
-<div class="achievementTitle">
-⚡ Легенда
-</div>
-<div>
-20 часов учебы
-</div>
-</div>
-</div>
-</div>
-</div>
+
 <script>
-const supabaseClient = supabase.createClient(
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieW9uenVsZGV2eWRka3Bub2xlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Njg4MzIsImV4cCI6MjA5NDE0NDgzMn0.d0Kb-l0jwLKB9kBARPKzk7hmDk-otW08HjJpA7fHWyM",
-"sb_publishable_vDd_MtQ6xQ-JY5WQc8Zliw_Ir6u15IE"
+const { createClient } = supabase
+
+const supabaseClient = createClient(
+"https://qbyonzuldevyddkpnole.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieW9uenVsZGV2eWRka3Bub2xlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Njg4MzIsImV4cCI6MjA5NDE0NDgzMn0.d0Kb-l0jwLKB9kBARPKzk7hmDk-otW08HjJpA7fHWyM"
 )
+
 let seconds = 0
 let timerInterval
+
 function updateTimer(){
 seconds++
-let mins = Math.floor(seconds/60)
-let secs = seconds%60
+let m = Math.floor(seconds/60)
+let s = seconds%60
 document.getElementById("timer").innerText =
-String(mins).padStart(2,"0")
-+ ":" +
-String(secs).padStart(2,"0")
+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")
 }
+
 async function signUp(){
 const email=document.getElementById("email").value
 const password=document.getElementById("password").value
-const {error}=await supabaseClient.auth.signUp({
-email,
-password
-})
-if(error){
-alert(error.message)
-return
-}
+
+const {error}=await supabaseClient.auth.signUp({email,password})
+
+if(error) return alert(error.message)
 alert("Аккаунт создан")
 }
+
 async function login(){
 const email=document.getElementById("email").value
 const password=document.getElementById("password").value
-const {error}=await supabaseClient.auth.signInWithPassword({
-email,
-password
-})
-if(error){
-alert(error.message)
-return
-}
+
+const {error}=await supabaseClient.auth.signInWithPassword({email,password})
+
+if(error) return alert(error.message)
 alert("Вход выполнен")
 }
+
 async function startStudy(){
 timerInterval=setInterval(updateTimer,1000)
-const {
-data:{user}
-}=await supabaseClient.auth.getUser()
-if(!user){
-alert("Сначала войди")
-return
-}
-await supabaseClient
-.from("study_sessions")
-.insert({
+
+const {data:{user}}=await supabaseClient.auth.getUser()
+if(!user) return alert("Сначала войди")
+
+await supabaseClient.from("study_sessions").insert({
 user_id:user.id,
 started_at:new Date()
 })
 }
+
 function stopStudy(){
 clearInterval(timerInterval)
 }
-async function loadLeaderboard(){
-const {data}=await supabaseClient
-.from("profiles")
-.select("*")
-.order("total_study_seconds",{ascending:false})
-.limit(10)
-if(!data) return
-document.getElementById("leaderboard").innerHTML=
-data.map(user=>`
-<div class="topUser">
-<div>
-🏆 ${user.username || "Пользователь"}
-</div>
-<div>
-${Math.floor(user.total_study_seconds/3600)} ч
-</div>
-</div>
-`).join("")
-}
+
 async function sendMessage(){
 const input=document.getElementById("messageInput")
 if(!input.value) return
-const {
-data:{user}
-}=await supabaseClient.auth.getUser()
-if(!user){
-alert("Войди")
-return
-}
-await supabaseClient
-.from("messages")
-.insert({
+
+const {data:{user}}=await supabaseClient.auth.getUser()
+if(!user) return alert("Войди")
+
+await supabaseClient.from("messages").insert({
 user_id:user.id,
 text:input.value
 })
+
 input.value=""
 loadMessages()
 }
+
 async function loadMessages(){
-const {data}=await supabaseClient
-.from("messages")
+const {data}=await supabaseClient.from("messages")
 .select("*")
 .order("created_at",{ascending:false})
 .limit(20)
+
 if(!data) return
-document.getElementById("chat").innerHTML=
-data.map(msg=>`
-<div class="message">
-💬 ${msg.text}
+
+document.getElementById("chat").innerHTML =
+data.map(m=>`<div class="message">💬 ${m.text}</div>`).join("")
+}
+
+async function loadLeaderboard(){
+const {data}=await supabaseClient.from("profiles")
+.select("*")
+.order("total_study_seconds",{ascending:false})
+.limit(10)
+
+if(!data) return
+
+document.getElementById("leaderboard").innerHTML =
+data.map(u=>`
+<div class="topUser">
+<div>🏆 ${u.username || "User"}</div>
+<div>${Math.floor((u.total_study_seconds||0)/3600)} ч</div>
 </div>
 `).join("")
 }
-loadLeaderboard()
+
 loadMessages()
+loadLeaderboard()
 setInterval(loadMessages,3000)
 </script>
+
 </body>
 </html>
