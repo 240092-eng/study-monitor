@@ -16,12 +16,10 @@ font-family:Inter,sans-serif;
 }
 
 body{
-background:
-radial-gradient(circle at top,#ff4fd855,transparent 40%),
+background: radial-gradient(circle at top,#ff4fd855,transparent 40%),
 linear-gradient(180deg,#0b0012,#050008);
 color:white;
 padding:25px;
-min-height:100vh;
 }
 
 .container{
@@ -36,18 +34,8 @@ border:1px solid rgba(255,105,210,.45);
 border-radius:24px;
 padding:20px;
 backdrop-filter:blur(18px);
-box-shadow:
-0 0 40px rgba(255,0,170,.25),
-inset 0 0 30px rgba(255,105,210,.08);
+box-shadow:0 0 40px rgba(255,0,170,.25);
 margin-bottom:20px;
-}
-
-.logo{
-font-size:12px;
-letter-spacing:4px;
-opacity:.7;
-margin-bottom:12px;
-color:#ff4fd8;
 }
 
 .title{
@@ -56,15 +44,13 @@ font-weight:800;
 margin-bottom:25px;
 }
 
-.pink{
-color:#ff4fd8;
-}
+.pink{color:#ff4fd8;}
 
 .cardTitle{
 font-size:12px;
 letter-spacing:2px;
 opacity:.6;
-margin-bottom:20px;
+margin-bottom:15px;
 text-transform:uppercase;
 }
 
@@ -72,17 +58,12 @@ text-transform:uppercase;
 font-size:72px;
 font-weight:800;
 color:#ff7cf0;
-margin-bottom:10px;
-}
-
-.small{
-opacity:.7;
-margin-bottom:20px;
 }
 
 .buttons{
 display:flex;
 gap:10px;
+margin-top:10px;
 }
 
 .btn{
@@ -130,21 +111,27 @@ margin-bottom:10px;
 border:1px solid rgba(255,105,210,.15);
 }
 
+/* ТОП СТУДЕНТОВ */
 .topUser{
 display:flex;
 justify-content:space-between;
+align-items:center;
 padding:16px;
 background:#1a0f22;
 border-radius:16px;
 margin-bottom:10px;
-border:1px solid rgba(255,105,210,.15);
+border:1px solid rgba(255,105,210,.2);
+}
+
+.rank{
+color:#ff4fd8;
+font-weight:800;
+margin-right:10px;
 }
 </style>
 </head>
 
 <body>
-
-<div class="logo">REALTIME MONITOR</div>
 
 <div class="title">
 Статусы <span class="pink">группы</span>
@@ -152,24 +139,16 @@ border:1px solid rgba(255,105,210,.15);
 
 <div class="container">
 
-<div class="left">
+<!-- LEFT -->
+<div>
 
 <div class="panel">
 <div class="cardTitle">Сессия учебы</div>
 <div class="bigTimer" id="timer">00:00</div>
-<div class="small">📚 Идет учебная сессия</div>
 
 <div class="buttons">
 <button class="btn green" onclick="startStudy()">▶️ Начать</button>
-<button class="btn red" onclick="stopStudy()">■ Завершить</button>
-</div>
-</div>
-
-<div class="panel">
-<div class="cardTitle">Ваш профиль</div>
-
-<div class="stats">
-<div id="studyStat">0 часов</div>
+<button class="btn red" onclick="stopStudy()">■ Стоп</button>
 </div>
 </div>
 
@@ -180,7 +159,8 @@ border:1px solid rgba(255,105,210,.15);
 
 </div>
 
-<div class="right">
+<!-- RIGHT -->
+<div>
 
 <div class="panel">
 <div class="cardTitle">Авторизация</div>
@@ -206,6 +186,7 @@ border:1px solid rgba(255,105,210,.15);
 </div>
 
 <script>
+
 const { createClient } = supabase
 
 const supabaseClient = createClient(
@@ -213,13 +194,13 @@ const supabaseClient = createClient(
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFieW9uenVsZGV2eWRka3Bub2xlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Njg4MzIsImV4cCI6MjA5NDE0NDgzMn0.d0Kb-l0jwLKB9kBARPKzk7hmDk-otW08HjJpA7fHWyM"
 )
 
-let seconds = 0
+let seconds=0
 let timerInterval
 
 function updateTimer(){
 seconds++
-let m = Math.floor(seconds/60)
-let s = seconds%60
+let m=Math.floor(seconds/60)
+let s=seconds%60
 document.getElementById("timer").innerText =
 String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")
 }
@@ -229,8 +210,8 @@ const email=document.getElementById("email").value
 const password=document.getElementById("password").value
 
 const {error}=await supabaseClient.auth.signUp({email,password})
-
 if(error) return alert(error.message)
+
 alert("Аккаунт создан")
 }
 
@@ -239,8 +220,8 @@ const email=document.getElementById("email").value
 const password=document.getElementById("password").value
 
 const {error}=await supabaseClient.auth.signInWithPassword({email,password})
-
 if(error) return alert(error.message)
+
 alert("Вход выполнен")
 }
 
@@ -260,6 +241,29 @@ function stopStudy(){
 clearInterval(timerInterval)
 }
 
+async function loadLeaderboard(){
+const {data}=await supabaseClient
+.from("profiles")
+.select("*")
+.order("total_study_seconds",{ascending:false})
+.limit(10)
+
+if(!data) return
+
+document.getElementById("leaderboard").innerHTML =
+data.map((u,i)=>`
+<div class="topUser">
+<div>
+<span class="rank">#${i+1}</span>
+${u.username || "User"}
+</div>
+<div>
+${Math.floor((u.total_study_seconds||0)/3600)} ч
+</div>
+</div>
+`).join("")
+}
+
 async function sendMessage(){
 const input=document.getElementById("messageInput")
 if(!input.value) return
@@ -277,7 +281,8 @@ loadMessages()
 }
 
 async function loadMessages(){
-const {data}=await supabaseClient.from("messages")
+const {data}=await supabaseClient
+.from("messages")
 .select("*")
 .order("created_at",{ascending:false})
 .limit(20)
@@ -288,26 +293,10 @@ document.getElementById("chat").innerHTML =
 data.map(m=>`<div class="message">💬 ${m.text}</div>`).join("")
 }
 
-async function loadLeaderboard(){
-const {data}=await supabaseClient.from("profiles")
-.select("*")
-.order("total_study_seconds",{ascending:false})
-.limit(10)
-
-if(!data) return
-
-document.getElementById("leaderboard").innerHTML =
-data.map(u=>`
-<div class="topUser">
-<div>🏆 ${u.username || "User"}</div>
-<div>${Math.floor((u.total_study_seconds||0)/3600)} ч</div>
-</div>
-`).join("")
-}
-
-loadMessages()
 loadLeaderboard()
+loadMessages()
 setInterval(loadMessages,3000)
+
 </script>
 
 </body>
